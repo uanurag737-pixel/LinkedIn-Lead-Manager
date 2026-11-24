@@ -1,0 +1,166 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>LinkedIn Lead Manager</title>
+
+    <style>
+        * { box-sizing: border-box; font-family: Arial, sans-serif; }
+
+        body { margin: 0; background: #f4f6fb; color: #202938; }
+
+        .sidebar {
+            width: 240px; height: 100vh; position: fixed;
+            background: #14213d; color: white; padding: 25px 18px;
+        }
+
+        .sidebar h2 { color: #60a5fa; margin-bottom: 35px; }
+
+        .sidebar a {
+            display: block; padding: 14px; color: #dbeafe;
+            text-decoration: none; border-radius: 8px;
+        }
+
+        .sidebar a.active, .sidebar a:hover { background: #263b60; }
+
+        .main { margin-left: 240px; padding: 30px; }
+
+        .header {
+            display: flex; justify-content: space-between;
+            align-items: center; margin-bottom: 25px;
+        }
+
+        .cards {
+            display: grid; grid-template-columns: repeat(2, 1fr);
+            gap: 18px; margin-bottom: 25px;
+        }
+
+        .card, .panel {
+            background: white; padding: 23px;
+            border-radius: 12px; margin-bottom: 22px;
+        }
+
+        .card p { color: #64748b; }
+        .card h2 { font-size: 30px; }
+
+        input {
+            padding: 12px; border: 1px solid #ddd;
+            border-radius: 7px; width: 100%; margin: 8px 0 15px;
+        }
+
+        button {
+            background: #2563eb; color: white; padding: 12px 18px;
+            border: none; border-radius: 7px; cursor: pointer;
+        }
+
+        table { width: 100%; border-collapse: collapse; margin-top: 15px; }
+        th, td { padding: 14px; text-align: left; border-bottom: 1px solid #eee; }
+        th { color: #64748b; }
+
+        .status {
+            background: #dcfce7; color: #15803d;
+            padding: 6px 10px; border-radius: 20px;
+        }
+
+        @media(max-width: 700px) {
+            .sidebar { width: 150px; }
+            .main { margin-left: 150px; padding: 15px; }
+            .cards { grid-template-columns: 1fr; }
+            .header { display: block; }
+        }
+    </style>
+</head>
+
+<body>
+
+<aside class="sidebar">
+    <h2>LeadConnect</h2>
+    <a href="/" class="active">Dashboard</a>
+    <a href="#leads">My Leads</a>
+    <a href="#add">Add New Lead</a>
+</aside>
+
+<main class="main">
+
+    <div class="header">
+        <div>
+            <h1>Dashboard</h1>
+            <p>Welcome to your LinkedIn outreach workspace.</p>
+        </div>
+    </div>
+
+    <section class="cards">
+        <div class="card">
+            <p>Total Leads</p>
+            <h2>{{ total }}</h2>
+        </div>
+
+        <div class="card">
+            <p>Connected Leads</p>
+            <h2>{{ connected }}</h2>
+        </div>
+    </section>
+
+    <section class="panel" id="add">
+        <h2>Add New Lead</h2>
+
+        <form action="/add-lead" method="POST">
+            <label>Name</label>
+            <input type="text" name="name" placeholder="Enter lead name" required>
+
+            <label>Designation</label>
+            <input type="text" name="designation" placeholder="Enter designation" required>
+
+            <label>Industry</label>
+            <input type="text" name="industry" placeholder="Enter industry" required>
+
+            <button type="submit">Save Lead</button>
+        </form>
+    </section>
+
+    <section class="panel" id="leads">
+        <h2>My Leads</h2>
+
+        <table>
+            <thead>
+                <tr>
+                    <th>Name</th>
+                    <th>Designation</th>
+                    <th>Industry</th>
+                    <th>Status</th>
+                    <th>Actions</th>
+                </tr>
+            </thead>
+
+            <tbody>
+                {% for lead in leads %}
+                <td>
+    <a href="{{ url_for('edit_lead', lead_id=lead.id) }}">Edit</a>
+
+    <form action="{{ url_for('delete_lead', lead_id=lead.id) }}"
+          method="POST"
+          style="display:inline;"
+          onsubmit="return confirm('Delete this lead?')">
+        <button type="submit">Delete</button>
+    </form>
+</td>
+                <tr>
+                    <td>{{ lead.name }}</td>
+                    <td>{{ lead.designation }}</td>
+                    <td>{{ lead.industry }}</td>
+                    <td><span class="status">{{ lead.status }}</span></td>
+                </tr>
+                {% else %}
+                <tr>
+                    <td colspan="5">No leads added yet.</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </section>
+
+</main>
+</body>
+</html>
